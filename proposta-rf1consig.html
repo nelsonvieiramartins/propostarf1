@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposta de Reestruturação — RF1 Consig</title>
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue:    #2EA3F2;
+      --blue2:   #1a78c2;
+      --blue3:   #0d4d8a;
+      --green:   #00C896;
+      --dark:    #080F1C;
+      --dark2:   #0D1B2A;
+      --dark3:   #162236;
+      --card:    #1a2744;
+      --card2:   #1f2e50;
+      --border:  rgba(46,163,242,0.2);
+      --text:    #c8d8ea;
+      --muted:   #6b8aaa;
+      --white:   #ffffff;
+      --warn:    #F2A52E;
+      --danger:  #F25C5C;
+      --radius:  12px;
+      --shadow:  0 8px 40px rgba(0,0,0,0.4);
+      --glow:    0 0 30px rgba(46,163,242,0.25);
+    }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    img { max-width: 100%; }
+    ::selection { background: var(--blue); color: #fff; }
+
+    /* ============================================================
+       SCROLLBAR
+    ============================================================ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--dark2); }
+    ::-webkit-scrollbar-thumb { background: var(--blue3); border-radius: 3px; }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(8,15,28,0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: box-shadow .3s;
+    }
+    #navbar.scrolled { box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 1.2rem; color: #fff;
+    }
+    .nav-brand span { color: var(--blue); }
+    .nav-logo-box {
+      width: 36px; height: 36px; background: var(--blue);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: .9rem; color: #fff;
+    }
+    .rf1-logo-img { height: 36px; width: auto; }
+    .nav-links {
+      display: flex; gap: .2rem; list-style: none;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      padding: .4rem .8rem; border-radius: 6px; font-size: .82rem;
+      color: var(--muted); transition: all .2s; white-space: nowrap;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--blue); background: rgba(46,163,242,0.1); }
+    .nav-badge {
+      background: var(--green); color: #051a10; font-size: .7rem;
+      font-weight: 700; padding: .2rem .6rem; border-radius: 20px;
+    }
+
+    /* ============================================================
+       PROGRESS BAR
+    ============================================================ */
+    #progress-bar {
+      position: fixed; top: 64px; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      width: 0%; z-index: 999; transition: width .1s linear;
+    }
+
+    /* ============================================================
+       SECTIONS COMMON
+    ============================================================ */
+    section { padding: 100px 2rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(46,163,242,0.12); border: 1px solid rgba(46,163,242,0.3);
+      color: var(--blue); font-size: .78rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: .35rem 1rem; border-radius: 20px; margin-bottom: 1.2rem;
+    }
+    .section-tag .dot {
+      width: 6px; height: 6px; background: var(--blue);
+      border-radius: 50%; animation: pulse-dot 1.5s infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .5; transform: scale(1.4); }
+    }
+    h1, h2, h3, h4 { color: #fff; line-height: 1.2; }
+    h2 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: .6rem; }
+    h3 { font-size: 1.4rem; font-weight: 700; }
+    .lead { font-size: 1.15rem; color: var(--muted); max-width: 650px; }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Fade-in animation */
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: .15s; }
+    .reveal-delay-2 { transition-delay: .3s; }
+    .reveal-delay-3 { transition-delay: .45s; }
+    .reveal-delay-4 { transition-delay: .6s; }
+
+    /* ============================================================
+       HERO SECTION
+    ============================================================ */
+    #hero {
+      min-height: auto;
+      display: flex; align-items: center;
+      padding-top: 120px;
+      padding-bottom: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(46,163,242,0.12) 0%, transparent 70%),
+                  radial-gradient(ellipse 40% 40% at 20% 80%, rgba(0,200,150,0.08) 0%, transparent 70%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(46,163,242,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(46,163,242,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(46,163,242,0.1); border: 1px solid rgba(46,163,242,0.25);
+      color: var(--blue); font-size: .82rem; font-weight: 600;
+      padding: .5rem 1.2rem; border-radius: 30px; margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow svg { width: 14px; height: 14px; }
+    #hero h1 {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 900; line-height: 1.05;
+      margin-bottom: 1.2rem;
+    }
+    .hero-subtitle {
+      font-size: 1.25rem; color: var(--muted);
+      max-width: 600px; margin-bottom: 2.5rem;
+    }
+    .hero-ctas {
+      display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0;
+    }
+    .btn-primary {
+      background: var(--blue); color: #fff; border: none;
+      padding: .85rem 2rem; border-radius: 8px; font-size: .95rem;
+      font-weight: 700; cursor: pointer;
+      transition: all .25s; display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 20px rgba(46,163,242,0.35);
+    }
+    .btn-primary:hover { background: var(--blue2); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(46,163,242,0.45); }
+    .btn-outline {
+      background: transparent; color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: .85rem 2rem; border-radius: 8px; font-size: .95rem;
+      font-weight: 600; cursor: pointer;
+      transition: all .25s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-outline:hover { border-color: var(--blue); color: var(--blue); background: rgba(46,163,242,0.08); }
+    .hero-stats {
+      display: flex; gap: 2.5rem; flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 2rem; font-weight: 900; color: #fff; line-height: 1; }
+    .hero-stat .num span { color: var(--blue); }
+    .hero-stat .label { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    .hero-divider { width: 1px; background: var(--border); align-self: stretch; }
+
+    /* ============================================================
+       DIAGNOSTIC SECTION
+    ============================================================ */
+    #diagnostico { background: var(--dark2); }
+    .diag-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 2rem; margin-top: 3rem;
+    }
+    .diag-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem;
+      position: relative; overflow: hidden;
+    }
+    .diag-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .diag-card.problem::before { background: var(--danger); }
+    .diag-card.opportunity::before { background: var(--green); }
+    .diag-card.neutral::before { background: var(--blue); }
+    .diag-card .card-header {
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1.2rem;
+    }
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .card-icon.red { background: rgba(242,92,92,0.15); }
+    .card-icon.green { background: rgba(0,200,150,0.15); }
+    .card-icon.blue { background: rgba(46,163,242,0.15); }
+    .card-icon.orange { background: rgba(242,165,46,0.15); }
+    .diag-list { list-style: none; display: flex; flex-direction: column; gap: .7rem; }
+    .diag-list li {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-size: .9rem; color: var(--text);
+    }
+    .diag-list li::before { content: '▸'; color: var(--blue); flex-shrink: 0; }
+    .diag-list.danger li::before { content: '✕'; color: var(--danger); }
+    .diag-list.success li::before { content: '✓'; color: var(--green); }
+
+    /* Current site screenshot placeholder */
+    .site-preview {
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+      margin-top: 3rem; position: relative; overflow: hidden;
+    }
+    .browser-chrome {
+      background: var(--dark3); border-radius: 8px 8px 0 0;
+      padding: .6rem 1rem; display: flex; align-items: center; gap: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .browser-dot.r { background: #FF5F57; }
+    .browser-dot.y { background: #FFBD2E; }
+    .browser-dot.g { background: #28CA41; }
+    .browser-url {
+      flex: 1; background: rgba(255,255,255,0.06); border-radius: 4px;
+      padding: .3rem .8rem; font-size: .8rem; color: var(--muted);
+      margin-left: .5rem; max-width: 350px;
+    }
+    .browser-body {
+      background: #f5f5f5; min-height: 220px; border-radius: 0 0 8px 8px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .current-site-label {
+      background: rgba(242,92,92,0.15); border: 1px dashed rgba(242,92,92,0.4);
+      padding: 1rem 1.5rem; border-radius: 8px; text-align: center;
+    }
+    .current-site-label .badge {
+      background: var(--danger); color: #fff; font-size: .7rem;
+      font-weight: 700; padding: .2rem .6rem; border-radius: 20px;
+      display: inline-block; margin-bottom: .5rem;
+    }
+    .current-site-label p { font-size: .85rem; color: #333; }
+    .current-site-label strong { color: #111; }
+
+    /* ============================================================
+       SUBDOMAINS MAP
+    ============================================================ */
+    #subdominios { background: var(--dark); }
+    .sub-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .sub-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+      transition: all .3s; position: relative; overflow: hidden;
+    }
+    .sub-card:hover { border-color: var(--blue); box-shadow: var(--glow); transform: translateY(-4px); }
+    .sub-card::after {
+      content: ''; position: absolute; top: 0; right: 0;
+      width: 80px; height: 80px;
+      background: radial-gradient(circle at top right, rgba(46,163,242,0.1), transparent 70%);
+    }
+    .sub-url {
+      font-size: .78rem; color: var(--blue); font-family: monospace;
+      background: rgba(46,163,242,0.1); padding: .3rem .7rem; border-radius: 4px;
+      margin-bottom: 1rem; display: inline-block; word-break: break-all;
+    }
+    .sub-status {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .72rem; font-weight: 700; padding: .25rem .7rem;
+      border-radius: 20px; margin-bottom: .8rem;
+    }
+    .sub-status.active { background: rgba(0,200,150,0.15); color: var(--green); }
+    .sub-status.legacy { background: rgba(242,165,46,0.15); color: var(--warn); }
+    .sub-status.new { background: rgba(46,163,242,0.15); color: var(--blue); }
+    .sub-status::before { content: '●'; font-size: .6rem; }
+    .sub-portals {
+      display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .8rem;
+    }
+    .portal-tag {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      font-size: .72rem; color: var(--muted); padding: .2rem .6rem; border-radius: 4px;
+    }
+    .sub-card h4 { font-size: 1rem; margin-bottom: .3rem; }
+    .sub-card .sub-desc { font-size: .85rem; color: var(--muted); margin-top: .5rem; }
+    .tech-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      font-size: .72rem; color: var(--text); padding: .25rem .65rem; border-radius: 4px;
+      margin-top: .5rem;
+    }
+
+    /* Architecture diagram */
+    .arch-diagram {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem; margin-top: 3rem;
+      text-align: center;
+    }
+    .arch-main {
+      display: inline-flex; flex-direction: column; align-items: center;
+    }
+    .arch-node {
+      background: var(--blue); color: #fff; font-weight: 700;
+      padding: .8rem 1.8rem; border-radius: 8px; font-size: .9rem;
+      box-shadow: 0 4px 20px rgba(46,163,242,0.4);
+      white-space: nowrap;
+    }
+    .arch-node.root { background: var(--blue2); font-size: 1rem; }
+    .arch-node.sub { background: var(--card2); border: 1px solid var(--blue); color: var(--blue); font-size: .82rem; }
+    .arch-node.new-node { background: rgba(0,200,150,0.15); border: 1px dashed var(--green); color: var(--green); font-size: .82rem; }
+    .arch-connector {
+      width: 2px; height: 30px; background: var(--border); margin: 0 auto;
+    }
+    .arch-row {
+      display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap;
+    }
+    .arch-branch {
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+    }
+    .arch-h-line {
+      height: 2px; background: var(--border);
+      width: calc(100% - 40px); position: absolute;
+    }
+
+    /* ============================================================
+       PROPOSAL SECTION
+    ============================================================ */
+    #proposta { background: var(--dark2); }
+    .pages-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem; margin-top: 3rem;
+    }
+    .page-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+      transition: all .3s; cursor: default;
+    }
+    .page-card:hover { border-color: var(--blue); transform: translateY(-3px); box-shadow: var(--glow); }
+    .page-num {
+      width: 32px; height: 32px; background: rgba(46,163,242,0.15);
+      border: 1px solid rgba(46,163,242,0.3); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 700; color: var(--blue);
+      margin-bottom: 1rem;
+    }
+    .page-card h4 { font-size: .95rem; margin-bottom: .5rem; }
+    .page-card p { font-size: .82rem; color: var(--muted); }
+    .new-page { border-color: rgba(0,200,150,0.3) !important; }
+    .new-page .page-num { background: rgba(0,200,150,0.1); border-color: rgba(0,200,150,0.3); color: var(--green); }
+    .new-badge {
+      display: inline-block; background: var(--green); color: #051a10;
+      font-size: .65rem; font-weight: 800; padding: .1rem .5rem;
+      border-radius: 20px; margin-left: .4rem; vertical-align: middle;
+    }
+
+    /* ============================================================
+       PORTAL SECTION
+    ============================================================ */
+    #portal { background: var(--dark); }
+    .portal-mockup {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; margin-top: 3rem;
+      box-shadow: var(--shadow);
+    }
+    .portal-sidebar {
+      background: var(--dark3); border-right: 1px solid var(--border);
+      width: 240px; padding: 1.5rem; flex-shrink: 0;
+    }
+    .portal-body { flex: 1; padding: 2rem; }
+    .portal-layout { display: flex; min-height: 500px; }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: 1rem; color: #fff; margin-bottom: 2rem;
+    }
+    .sidebar-logo .box {
+      width: 30px; height: 30px; background: var(--blue);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 900; color: #fff;
+    }
+    .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: .3rem; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: .6rem;
+      padding: .6rem .8rem; border-radius: 7px; font-size: .84rem;
+      color: var(--muted); transition: all .2s;
+    }
+    .sidebar-menu li a:hover, .sidebar-menu li a.active {
+      background: rgba(46,163,242,0.12); color: var(--blue);
+    }
+    .sidebar-menu .menu-icon { width: 16px; text-align: center; }
+    .sidebar-section {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--muted); margin: 1.2rem 0 .5rem;
+    }
+    .portal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+      background: var(--dark3);
+    }
+    .portal-header h3 { font-size: 1.1rem; }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .user-chip {
+      display: flex; align-items: center; gap: .5rem;
+      background: rgba(255,255,255,0.06); border-radius: 20px;
+      padding: .35rem .9rem; font-size: .82rem;
+    }
+    .avatar {
+      width: 24px; height: 24px; background: var(--blue);
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: .65rem; font-weight: 700; color: #fff;
+    }
+    .portal-content { flex: 1; }
+    .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .portal-stat-card {
+      background: var(--dark3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.2rem;
+    }
+    .portal-stat-card .ps-label { font-size: .75rem; color: var(--muted); margin-bottom: .4rem; }
+    .portal-stat-card .ps-value { font-size: 1.5rem; font-weight: 800; color: #fff; }
+    .portal-stat-card .ps-tag { font-size: .72rem; margin-top: .2rem; }
+    .portal-stat-card .ps-tag.up { color: var(--green); }
+    .portal-stat-card .ps-tag.neu { color: var(--blue); }
+    .access-table {
+      width: 100%; border-collapse: collapse; font-size: .82rem;
+    }
+    .access-table th {
+      background: rgba(46,163,242,0.08); color: var(--blue);
+      padding: .6rem 1rem; text-align: left; font-size: .75rem;
+      text-transform: uppercase; letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+    }
+    .access-table td {
+      padding: .7rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+    .access-table tr:hover td { background: rgba(46,163,242,0.04); }
+    .link-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(46,163,242,0.12); color: var(--blue);
+      border: 1px solid rgba(46,163,242,0.25); border-radius: 5px;
+      padding: .25rem .7rem; font-size: .75rem; font-weight: 600;
+      transition: all .2s; cursor: pointer;
+    }
+    .link-btn:hover { background: var(--blue); color: #fff; }
+    .status-dot {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .75rem;
+    }
+    .status-dot::before { content: '●'; font-size: .55rem; }
+    .status-dot.on { color: var(--green); }
+    .status-dot.off { color: var(--danger); }
+    .status-dot.warn { color: var(--warn); }
+
+    /* ============================================================
+       FEATURES SECTION
+    ============================================================ */
+    #funcionalidades { background: var(--dark2); }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.8rem;
+      transition: all .3s;
+    }
+    .feature-card:hover { border-color: var(--blue); box-shadow: var(--glow); }
+    .feature-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 1.2rem;
+      background: linear-gradient(135deg, rgba(46,163,242,0.2), rgba(46,163,242,0.05));
+      border: 1px solid rgba(46,163,242,0.2);
+    }
+    .feature-card h4 { font-size: 1.05rem; margin-bottom: .6rem; }
+    .feature-card p { font-size: .87rem; color: var(--muted); }
+
+    /* ============================================================
+       TIMELINE
+    ============================================================ */
+    #cronograma { background: var(--dark); }
+    .timeline {
+      position: relative; max-width: 800px; margin: 3rem auto 0;
+      padding-left: 2rem;
+    }
+    .timeline::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 2px; background: linear-gradient(180deg, var(--blue), var(--green));
+    }
+    .tl-item {
+      position: relative; margin-bottom: 2.5rem;
+      padding-left: 2.5rem;
+    }
+    .tl-dot {
+      position: absolute; left: -2.15rem; top: .3rem;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--blue); border: 2px solid var(--dark);
+      box-shadow: 0 0 0 3px rgba(46,163,242,0.25);
+    }
+    .tl-dot.green { background: var(--green); box-shadow: 0 0 0 3px rgba(0,200,150,0.25); }
+    .tl-dot.warn { background: var(--warn); box-shadow: 0 0 0 3px rgba(242,165,46,0.25); }
+    .tl-week {
+      display: inline-block; background: rgba(46,163,242,0.1);
+      border: 1px solid rgba(46,163,242,0.25); color: var(--blue);
+      font-size: .75rem; font-weight: 700; padding: .2rem .7rem;
+      border-radius: 20px; margin-bottom: .5rem;
+    }
+    .tl-week.g { background: rgba(0,200,150,0.1); border-color: rgba(0,200,150,0.25); color: var(--green); }
+    .tl-week.w { background: rgba(242,165,46,0.1); border-color: rgba(242,165,46,0.25); color: var(--warn); }
+    .tl-content {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.4rem;
+    }
+    .tl-content h4 { font-size: 1rem; margin-bottom: .4rem; }
+    .tl-content p { font-size: .87rem; color: var(--muted); }
+    .tl-tasks {
+      display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .8rem;
+    }
+    .tl-task {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+      font-size: .75rem; color: var(--text); padding: .2rem .6rem; border-radius: 4px;
+    }
+
+    /* ============================================================
+       PRICING SECTION
+    ============================================================ */
+    #investimento { background: var(--dark2); }
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem; margin-top: 3rem; align-items: start;
+    }
+    .pricing-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem;
+      position: relative; transition: all .3s;
+    }
+    .pricing-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+    .pricing-card.featured {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 1px var(--blue), var(--glow);
+    }
+    .pricing-card.featured::before {
+      content: 'MAIS POPULAR';
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--blue); color: #fff;
+      font-size: .7rem; font-weight: 800; letter-spacing: .1em;
+      padding: .3rem 1rem; border-radius: 20px;
+    }
+    .plan-name {
+      font-size: .8rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--muted); margin-bottom: .3rem;
+    }
+    .plan-price {
+      margin: 1rem 0;
+    }
+    .plan-price .currency {
+      font-size: 1.2rem; font-weight: 700; color: var(--blue);
+      vertical-align: top; margin-top: .3rem; display: inline-block;
+    }
+    .plan-price .amount {
+      font-size: 3.2rem; font-weight: 900; color: #fff; line-height: 1;
+    }
+    .plan-price .period {
+      font-size: .85rem; color: var(--muted); display: block; margin-top: .2rem;
+    }
+    .plan-divider { height: 1px; background: var(--border); margin: 1.2rem 0; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: .7rem; margin-bottom: 1.8rem; }
+    .plan-features li {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-size: .88rem; color: var(--text);
+    }
+    .plan-features li .check { color: var(--green); flex-shrink: 0; margin-top: 1px; }
+    .plan-features li .cross { color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+    .plan-features li.muted { color: var(--muted); }
+    .btn-plan {
+      display: block; width: 100%; text-align: center;
+      padding: .85rem; border-radius: 8px; font-weight: 700;
+      font-size: .9rem; cursor: pointer; transition: all .25s; border: none;
+    }
+    .btn-plan.blue { background: var(--blue); color: #fff; }
+    .btn-plan.blue:hover { background: var(--blue2); }
+    .btn-plan.outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-plan.outline:hover { border-color: var(--blue); color: var(--blue); }
+    .btn-plan.green { background: var(--green); color: #051a10; }
+    .btn-plan.green:hover { filter: brightness(0.9); }
+
+    /* Payment methods */
+    .payment-section {
+      margin-top: 3.5rem; background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2.5rem;
+    }
+    .payment-section h3 { margin-bottom: 2rem; }
+    .payment-methods {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+    }
+    .payment-method {
+      background: var(--dark3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.5rem; text-align: center;
+      transition: all .3s;
+    }
+    .payment-method:hover { border-color: var(--blue); }
+    .payment-method .pm-icon { font-size: 2.2rem; margin-bottom: .6rem; }
+    .payment-method .pm-name { font-weight: 700; font-size: .9rem; color: #fff; margin-bottom: .3rem; }
+    .payment-method .pm-desc { font-size: .8rem; color: var(--muted); }
+    .discount-badge {
+      display: inline-block; background: var(--green); color: #051a10;
+      font-size: .72rem; font-weight: 800; padding: .15rem .5rem;
+      border-radius: 4px; margin-top: .4rem;
+    }
+
+    /* Custom quote */
+    .custom-quote {
+      margin-top: 2rem; background: linear-gradient(135deg, rgba(46,163,242,0.1), rgba(0,200,150,0.05));
+      border: 1px solid rgba(46,163,242,0.25); border-radius: var(--radius);
+      padding: 2rem; display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;
+    }
+    .custom-quote .cq-text h4 { font-size: 1.1rem; margin-bottom: .4rem; }
+    .custom-quote .cq-text p { font-size: .87rem; color: var(--muted); }
+    .custom-quote .cq-actions { display: flex; gap: .8rem; flex-wrap: wrap; flex-shrink: 0; }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background: var(--dark3); border-top: 1px solid var(--border);
+      padding: 3rem 2rem;
+    }
+    .footer-grid {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr;
+      gap: 3rem; margin-bottom: 2.5rem;
+    }
+    .footer-brand .fb-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 1.1rem; color: #fff; margin-bottom: 1rem;
+    }
+    .footer-brand .fb-logo .box {
+      width: 34px; height: 34px; background: var(--blue);
+      border-radius: 7px; display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: .85rem; color: #fff;
+    }
+    .footer-brand p { font-size: .85rem; color: var(--muted); max-width: 280px; }
+    .footer-col h4 { font-size: .9rem; color: #fff; margin-bottom: 1rem; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+    .footer-col ul li a { font-size: .84rem; color: var(--muted); transition: color .2s; }
+    .footer-col ul li a:hover { color: var(--blue); }
+    .footer-bottom {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 1.5rem; border-top: 1px solid var(--border);
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-bottom p { font-size: .8rem; color: var(--muted); }
+    .footer-bottom .agency {
+      font-size: .8rem; color: var(--muted);
+    }
+    .footer-bottom .agency strong { color: var(--blue); }
+
+    /* ============================================================
+       UTILITY / MISC
+    ============================================================ */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+    .text-center { text-align: center; }
+    .text-center .lead { margin: 0 auto; }
+    .mt-1 { margin-top: .5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mt-3 { margin-top: 1.5rem; }
+    .mt-4 { margin-top: 2rem; }
+    .mb-3 { margin-bottom: 1.5rem; }
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(46,163,242,0.08), rgba(0,200,150,0.04));
+      border: 1px solid rgba(46,163,242,0.2); border-radius: var(--radius);
+      padding: 1.5rem 2rem; margin-top: 2rem;
+    }
+    .highlight-box h4 { font-size: 1rem; color: var(--blue); margin-bottom: .5rem; }
+    .highlight-box p { font-size: .88rem; color: var(--text); }
+
+    /* Comparison table */
+    .comparison-table {
+      width: 100%; border-collapse: collapse; margin-top: 2.5rem;
+      font-size: .88rem;
+    }
+    .comparison-table th {
+      padding: .9rem 1.2rem; font-size: .8rem; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .comparison-table th.blue-head { color: var(--blue); background: rgba(46,163,242,0.06); }
+    .comparison-table td {
+      padding: .8rem 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text); vertical-align: middle;
+    }
+    .comparison-table td.blue-col { background: rgba(46,163,242,0.04); }
+    .comparison-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .comparison-table tr:hover td.blue-col { background: rgba(46,163,242,0.07); }
+    .ct-yes { color: var(--green); font-weight: 700; }
+    .ct-no { color: var(--danger); }
+    .ct-partial { color: var(--warn); }
+
+    /* Info strip */
+    .info-strip {
+      background: rgba(46,163,242,0.08); border: 1px solid rgba(46,163,242,0.2);
+      border-radius: 8px; padding: 1rem 1.4rem;
+      display: flex; align-items: center; gap: .8rem; margin-top: 2rem;
+    }
+    .info-strip .info-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .info-strip p { font-size: .85rem; color: var(--text); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .diag-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .portal-layout { flex-direction: column; }
+      .portal-sidebar { width: 100%; }
+      .nav-links { display: none; }
+      .custom-quote { flex-direction: column; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 70px 1.2rem; }
+      .hero-stats { flex-wrap: wrap; gap: 1.5rem; }
+      .hero-divider { display: none; }
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ============================================================
+       BACK TO TOP
+    ============================================================ */
+    #back-top {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100;
+      width: 44px; height: 44px; background: var(--blue);
+      border-radius: 50%; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(46,163,242,0.4);
+      opacity: 0; transition: opacity .3s; font-size: 1.1rem; color: #fff;
+    }
+    #back-top.show { opacity: 1; }
+    #back-top:hover { background: var(--blue2); }
+
+    /* section alt bg pattern */
+    #portal { position: relative; overflow: hidden; }
+    #portal::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 50% 80% at 90% 50%, rgba(46,163,242,0.06), transparent 70%);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVBAR
+============================================================ -->
+<nav id="navbar">
+  <div class="nav-brand">
+    <svg class="rf1-logo-img" viewBox="0 0 172 117" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#ffffff" d="M104.8,4.6h-45.7v50.4h45.7l-24.5-25.2,24.5-25.2ZM99.4,6.9l-20.7,21.3-17.2-17.8v-3.4h37.9ZM99.4,52.8h-37.9V13.6l15.6,16.2h0s22.3,22.9,22.3,22.9Z"/>
+      <polygon fill="#ffffff" points="87.6 30.1 112 4.6 108.8 4.6 84.3 30.1 109.6 55 112.9 55 87.6 30.1"/>
+      <path fill="#ffffff" d="M14,54.7c1.2,0,2.3.2,3.3.5,1,.3,1.8.8,2.5,1.4.7.6,1.2,1.4,1.6,2.2.4.9.6,1.9.6,2.9v16.5c0,1.2-.2,2.2-.7,3-.5.8-1.2,1.4-2,1.9.9.5,1.6,1.1,2,1.8.5.8.7,1.7.7,2.9v17.5c0,2.2-.7,3.9-2.2,5.2-1.5,1.3-3.4,1.9-5.9,1.9h-7.3c-.3,0-.5,0-.6-.2-.1-.2-.2-.4-.2-.6v-56c0-.2,0-.5.2-.6.1-.2.4-.2.6-.2h7.4ZM16.3,61.7c0-.7-.2-1.3-.6-1.8-.4-.5-1-.7-1.9-.7h-2.5v21.4h2.5c.8,0,1.5-.2,1.9-.7.4-.5.6-1.1.6-1.8v-16.5ZM16.3,87.8c0-.7-.2-1.3-.6-1.8-.4-.5-1-.7-1.8-.7h-2.5v22.5h2.5c.8,0,1.5-.2,1.9-.7.4-.5.6-1.1.6-1.8v-17.5Z"/>
+      <path fill="#ffffff" d="M51.9,63.7c1.2,0,2.3.2,3.3.5,1,.3,1.8.8,2.5,1.4.7.6,1.2,1.3,1.6,2.2s.6,1.9.6,2.9v15c0,1.2-.2,2.2-.7,3-.5.8-1.2,1.4-2,1.9.9.5,1.6,1.1,2,1.8.5.8.7,1.7.7,2.9v16.1c0,.2,0,.5-.2.6-.1.2-.4.2-.6.2h-2.4c-.8,0-1.4-.2-1.8-.7-.4-.5-.6-1-.6-1.8v-14.6c0-.7-.2-1.3-.6-1.8s-1-.7-1.9-.7h-2.5v17c0,.7-.2,1.3-.6,1.8-.4.5-1,.7-1.8.7h-2.4c-.3,0-.5,0-.6-.2-.1-.2-.2-.4-.2-.6v-46.9c0-.2,0-.5.2-.6.1-.2.4-.2.6-.2h7.4ZM49.4,68.3v20h2.5c.8,0,1.5-.2,1.9-.7.4-.5.6-1.1.6-1.8v-15c0-.7-.2-1.3-.6-1.8-.4-.5-1-.7-1.8-.7h-2.5Z"/>
+      <path fill="#ffffff" d="M90.8,63.7c.3,0,.5,0,.6.2.1.2.2.4.3.6l4.6,46.8c0,.2,0,.5-.2.7-.2.2-.5.3-.9.3h-2.1c-.7,0-1.3-.2-1.8-.6-.5-.4-.7-.9-.8-1.5l-.4-6.6h-3.5l-.4,6.6c0,.6-.3,1.1-.8,1.5-.5.4-1,.6-1.8.6h-2.1c-.4,0-.7-.1-.9-.3-.2-.2-.3-.5-.2-.7l4.6-46.8c0-.2.1-.4.3-.6.1-.2.3-.2.6-.2h4.8ZM87,99.1h2.9l-1.5-23.5-1.4,23.5Z"/>
+      <path fill="#ffffff" d="M121.8,112.4c-.3,0-.5,0-.6-.2s-.2-.4-.3-.6l-4.6-46.8c0-.2,0-.5.2-.7.2-.2.5-.3.9-.3h2.1c.7,0,1.3.2,1.8.6.5.4.7.9.8,1.5l2.2,34.8,2.2-34.8c0-.6.3-1.1.8-1.5.5-.4,1-.6,1.8-.6h2.1c.4,0,.7.1.9.3.2.2.3.5.2.7l-4.6,46.8c0,.2-.1.4-.3.6-.1.2-.3.2-.6.2h-4.8Z"/>
+      <path fill="#ffffff" d="M165.3,54.7c.3,0,.5,0,.6.2.2.1.3.3.3.6v1.4c0,.7-.2,1.3-.6,1.7-.4.4-.9.7-1.6.7h-5.2v22.2h5.6c.3,0,.5,0,.6.2.2.1.3.3.3.6v1.4c0,.7-.2,1.3-.6,1.7-.4.4-.9.7-1.6.7h-4.4v21.7h5.2c.6,0,1.2.2,1.6.7.4.4.6,1,.6,1.7v1.4c0,.3,0,.5-.3.6-.2.1-.4.2-.6.2h-11.3c-.3,0-.5,0-.6-.2-.1-.2-.2-.4-.2-.6v-56c0-.2,0-.5.2-.6.1-.2.4-.2.6-.2h11.3Z"/>
+    </svg>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#diagnostico">Diagnóstico</a></li>
+    <li><a href="#proposta">Proposta</a></li>
+    <li><a href="#funcionalidades">Funcionalidades</a></li>
+    <li><a href="#cronograma">Cronograma</a></li>
+    <li><a href="#investimento">Investimento</a></li>
+  </ul>
+  <span class="nav-badge">Proposta 2026</span>
+</nav>
+<div id="progress-bar"></div>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content container">
+    <div class="hero-eyebrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+      Proposta de Reestruturação Digital
+    </div>
+    <h1>
+      Da landing page ao site que a<br/>
+      <span class="gradient-text">RF1 Consig</span> merece
+    </h1>
+    <p class="hero-subtitle">
+      Um site institucional completo, profissional e confiável — com todas as informações
+      que seus clientes e parceiros precisam encontrar.
+    </p>
+    <div class="hero-ctas">
+      <a href="#investimento" class="btn-primary">
+        Ver Investimento
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+      <a href="#proposta" class="btn-outline">Ver Proposta Completa</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     DIAGNÓSTICO ATUAL
+============================================================ -->
+<section id="diagnostico">
+  <div class="container">
+    <div class="text-center reveal">
+      <div class="section-tag"><span class="dot"></span> Fase 01 — Análise</div>
+      <h2>Diagnóstico do <span class="gradient-text">Site Atual</span></h2>
+      <p class="lead">Avaliação completa do estado atual da presença digital da RF1 Consig e identificação dos pontos críticos de melhoria.</p>
+    </div>
+
+    <div class="site-preview reveal mt-4">
+      <div class="browser-chrome">
+        <div class="browser-dot r"></div>
+        <div class="browser-dot y"></div>
+        <div class="browser-dot g"></div>
+        <div class="browser-url">🔒 rf1consig.com.br</div>
+      </div>
+      <div class="browser-body" style="flex-direction:column;gap:0;background:#0D1B2A;min-height:180px;padding:1.5rem;">
+        <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.5rem;">
+          <div style="width:80px;height:30px;background:rgba(46,163,242,0.3);border-radius:4px;"></div>
+          <div style="flex:1;display:flex;gap:.8rem;justify-content:flex-end;">
+            <div style="width:60px;height:18px;background:rgba(255,255,255,0.1);border-radius:3px;"></div>
+            <div style="width:60px;height:18px;background:rgba(255,255,255,0.1);border-radius:3px;"></div>
+            <div style="width:60px;height:18px;background:rgba(255,255,255,0.1);border-radius:3px;"></div>
+            <div style="width:80px;height:28px;background:rgba(46,163,242,0.4);border-radius:4px;"></div>
+          </div>
+        </div>
+        <div style="text-align:center;padding:1.5rem;border:1px dashed rgba(242,165,46,0.4);border-radius:8px;background:rgba(242,165,46,0.05);">
+          <div style="background:rgba(242,165,46,0.2);color:#F2A52E;font-size:.7rem;font-weight:700;padding:.2rem .6rem;border-radius:20px;display:inline-block;margin-bottom:.6rem;">⚠ LANDING PAGE ÚNICA</div>
+          <div style="font-size:.9rem;color:#fff;font-weight:600;margin-bottom:.3rem;">Especialista na gestão de margens consignáveis</div>
+          <div style="font-size:.78rem;color:#6b8aaa;">WordPress + Divi Theme — Página única sem estrutura de site completo</div>
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;">
+          <div style="flex:1;height:50px;background:rgba(46,163,242,0.08);border:1px solid rgba(46,163,242,0.15);border-radius:6px;min-width:80px;"></div>
+          <div style="flex:1;height:50px;background:rgba(46,163,242,0.08);border:1px solid rgba(46,163,242,0.15);border-radius:6px;min-width:80px;"></div>
+          <div style="flex:1;height:50px;background:rgba(46,163,242,0.08);border:1px solid rgba(46,163,242,0.15);border-radius:6px;min-width:80px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="diag-grid mt-4">
+      <div class="diag-card problem reveal">
+        <div class="card-header">
+          <div class="card-icon red">🚫</div>
+          <h3>Problemas Identificados</h3>
+        </div>
+        <ul class="diag-list danger">
+          <li>Site é uma única landing page — sem estrutura de navegação real</li>
+          <li>Ausência de página institucional completa com equipe e história</li>
+          <li>Nenhuma página dedicada a órgãos, servidores ou consignatárias</li>
+          <li>Identidade pouco confiável — parece um site temporário, não uma empresa consolidada</li>
+          <li>FAQ básico e sem organização por público-alvo</li>
+          <li>Formulário de contato fraco sem categorização das solicitações</li>
+          <li>Performance prejudicada pelo WordPress + Divi sem otimização</li>
+        </ul>
+      </div>
+
+      <div class="diag-card opportunity reveal reveal-delay-1">
+        <div class="card-header">
+          <div class="card-icon green">✅</div>
+          <h3>Pontos Positivos</h3>
+        </div>
+        <ul class="diag-list success">
+          <li>Domínio rf1consig.com.br bem posicionado e já conhecido no mercado</li>
+          <li>Sistema SGConsig já em produção e funcionando nos clientes</li>
+          <li>Identidade visual clara com azul (#2EA3F2) como cor primária</li>
+          <li>FAQ já existente com artigos de suporte</li>
+          <li>Empresa consolidada com clientes reais nos estados do PA e RR</li>
+          <li>Dados de contato presentes: suporte@rf1consig.com.br</li>
+          <li>Reputação construída — falta apenas a presença digital que reflita isso</li>
+        </ul>
+      </div>
+
+      <div class="diag-card neutral reveal reveal-delay-2">
+        <div class="card-header">
+          <div class="card-icon blue">🔍</div>
+          <h3>Informações Técnicas</h3>
+        </div>
+        <ul class="diag-list">
+          <li>Plataforma atual: WordPress com tema Divi v4.25.0</li>
+          <li>Paleta de cores: Azul #2EA3F2 / Verde #7CC68D / Branco</li>
+          <li>Fonte: Open Sans, Arial (atual) → Manter família sans-serif</li>
+          <li>Endereço: Tv. Quintino Bocaiuva, 2301 — Belém/PA</li>
+          <li>Contato: (91) 98619-2525 | suporte@rf1consig.com.br</li>
+          <li>Portais legados: ASP.NET Web Forms (v1.1202.R01.0.2015)</li>
+          <li>Portal moderno: Microsoft Blazor WASM (Ananindeua)</li>
+        </ul>
+      </div>
+
+      <div class="diag-card neutral reveal reveal-delay-3">
+        <div class="card-header">
+          <div class="card-icon orange">🎯</div>
+          <h3>Oportunidades de Mercado</h3>
+        </div>
+        <ul class="diag-list">
+          <li>Site profissional gera credibilidade na prospecção de novos clientes</li>
+          <li>Página de Soluções clara sobre o SGConsig e o que a RF1 entrega</li>
+          <li>Presença clara dos locais de atuação na página Quem Somos</li>
+          <li>FAQ bem estruturada reduz volume de chamados de suporte</li>
+          <li>Design moderno posiciona a RF1 como referência no setor</li>
+          <li>Performance e SEO otimizados aumentam visibilidade nos buscadores</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROPOSTA DE REESTRUTURAÇÃO — anchor placeholder removed
+============================================================ -->
+<section id="subdominios" style="display:none">
+  <div class="container">
+    <div class="sub-grid">
+      <!-- Card 1: Principal -->
+      <div class="sub-card reveal">
+        <div class="sub-url">rf1consig.com.br</div>
+        <div><span class="sub-status active">Ativo</span></div>
+        <h4>Site Institucional Principal</h4>
+        <p class="sub-desc">Landing page corporativa. Ponto de entrada de todos os visitantes. Contém FAQ e informações gerais da empresa.</p>
+        <div class="sub-portals">
+          <span class="portal-tag">FAQ</span>
+          <span class="portal-tag">Contato</span>
+          <span class="portal-tag">WordPress</span>
+        </div>
+        <div class="tech-badge">⚙ WordPress + Divi 4.25</div>
+      </div>
+
+      <!-- Card 2: Boa Vista -->
+      <div class="sub-card reveal reveal-delay-1">
+        <div class="sub-url">boavista.rf1consig.com.br</div>
+        <div><span class="sub-status legacy">Legacy Ativo</span></div>
+        <h4>Boa Vista — RR</h4>
+        <p class="sub-desc">Portal completo para Boa Vista (Roraima). Inclui portal do servidor, consignatária e mural de notícias com log de operações mensais.</p>
+        <div class="sub-portals">
+          <span class="portal-tag">Portal Servidor</span>
+          <span class="portal-tag">Portal Consignatária</span>
+          <span class="portal-tag">Mural de Notícias</span>
+        </div>
+        <div class="tech-badge">⚙ ASP.NET SGConsig v1.1202.R01</div>
+      </div>
+
+      <!-- Card 3: Portel -->
+      <div class="sub-card reveal reveal-delay-2">
+        <div class="sub-url">portel.rf1consig.com.br</div>
+        <div><span class="sub-status legacy">Legacy Ativo</span></div>
+        <h4>Portel — PA</h4>
+        <p class="sub-desc">Instância do SGConsig para Portel, no Pará. Possui portal do gestor para administradores e portal do servidor.</p>
+        <div class="sub-portals">
+          <span class="portal-tag">Portal Servidor</span>
+          <span class="portal-tag">Portal Gestor</span>
+        </div>
+        <div class="tech-badge">⚙ ASP.NET SGConsig</div>
+      </div>
+
+      <!-- Card 4: Ananindeua -->
+      <div class="sub-card reveal reveal-delay-3">
+        <div class="sub-url">ananindeua.rf1consig.com.br</div>
+        <div><span class="sub-status new">Novo Sistema</span></div>
+        <h4>Ananindeua — PA</h4>
+        <p class="sub-desc">Portal moderno usando a nova plataforma Blazor. Login unificado via CPF. Sistema de recuperação de senha integrado. Representa a nova geração da plataforma RF1.</p>
+        <div class="sub-portals">
+          <span class="portal-tag">Login Unificado</span>
+          <span class="portal-tag">Recuperar Senha</span>
+          <span class="portal-tag">Blazor WASM</span>
+        </div>
+        <div class="tech-badge">⚙ Microsoft Blazor (.NET)</div>
+      </div>
+
+      <!-- Card 5: Campos -->
+      <div class="sub-card reveal">
+        <div class="sub-url">campos.rf1consig.com.br</div>
+        <div><span class="sub-status" style="background:rgba(242,92,92,0.12);color:#F25C5C;">Possivelmente Offline</span></div>
+        <h4>Campos</h4>
+        <p class="sub-desc">Indexado em motores de busca porém retornando erro 404. Pode ter sido descontinuado ou migrado. Necessita verificação e possível reativação ou redirecionamento.</p>
+        <div class="sub-portals">
+          <span class="portal-tag">Portal Servidor</span>
+          <span class="portal-tag">⚠ Verificar</span>
+        </div>
+        <div class="tech-badge">⚙ ASP.NET SGConsig (possível)</div>
+      </div>
+
+      <!-- Card 6: Futuro -->
+      <div class="sub-card reveal reveal-delay-1" style="border-color:rgba(0,200,150,0.25);background:rgba(0,200,150,0.04);">
+        <div class="sub-url" style="background:rgba(0,200,150,0.1);color:#00C896;">portal.rf1consig.com.br</div>
+        <div><span class="sub-status new">Proposto</span></div>
+        <h4>Portal Unificado <span class="new-badge">NOVO</span></h4>
+        <p class="sub-desc">Subdomínio central proposto para concentrar o acesso a todos os portais dos clientes com autenticação unificada, dashboard administrativo e gestão centralizada.</p>
+        <div class="sub-portals">
+          <span class="portal-tag">Auth Central</span>
+          <span class="portal-tag">Dashboard</span>
+          <span class="portal-tag">Multi-cliente</span>
+        </div>
+        <div class="tech-badge">⚙ A definir (Next.js / Laravel)</div>
+      </div>
+    </div>
+
+    <!-- Architecture Diagram -->
+    <div class="arch-diagram reveal mt-4">
+      <div class="section-tag" style="margin-bottom:1.5rem;"><span class="dot"></span> Arquitetura Atual dos Subdomínios</div>
+      <div class="arch-main">
+        <div class="arch-node root">🌐 rf1consig.com.br</div>
+        <div class="arch-connector"></div>
+        <div class="arch-row">
+          <div class="arch-branch">
+            <div class="arch-node sub">boavista.*</div>
+            <div class="arch-connector"></div>
+            <div style="font-size:.7rem;color:var(--muted);">ASP.NET</div>
+          </div>
+          <div class="arch-branch">
+            <div class="arch-node sub">portel.*</div>
+            <div class="arch-connector"></div>
+            <div style="font-size:.7rem;color:var(--muted);">ASP.NET</div>
+          </div>
+          <div class="arch-branch">
+            <div class="arch-node sub">campos.*</div>
+            <div class="arch-connector"></div>
+            <div style="font-size:.7rem;color:var(--danger);">Offline?</div>
+          </div>
+          <div class="arch-branch">
+            <div class="arch-node sub" style="border-color:var(--green);color:var(--green);">ananindeua.*</div>
+            <div class="arch-connector"></div>
+            <div style="font-size:.7rem;color:var(--green);">Blazor</div>
+          </div>
+          <div class="arch-branch">
+            <div class="arch-node new-node">portal.* ✨</div>
+            <div class="arch-connector"></div>
+            <div style="font-size:.7rem;color:var(--green);">Proposto</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROPOSTA DE REESTRUTURAÇÃO
+============================================================ -->
+<section id="proposta">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-tag"><span class="dot"></span> Fase 02 — Solução</div>
+      <h2>Proposta de <span class="gradient-text">Reestruturação</span></h2>
+      <p class="lead">Transformação do site em uma presença digital completa, profissional e informativa — com estrutura clara para cada público atendido pela RF1 Consig.</p>
+    </div>
+
+    <div class="highlight-box reveal">
+      <h4>🎯 Objetivo Central</h4>
+      <p>Transformar rf1consig.com.br de uma simples landing page em um <strong style="color:#fff">site institucional completo e confiável</strong> — com páginas dedicadas para cada público atendido — servidores e consignatárias —, apresentando a empresa de forma profissional, com informações claras sobre os locais de atuação e facilitando o contato comercial.</p>
+    </div>
+
+    <h3 class="mt-4 mb-3 reveal">Estrutura do Novo Site — Páginas Propostas</h3>
+    <div class="pages-grid">
+      <div class="page-card reveal">
+        <div class="page-num">01</div>
+        <h4>Home / Página Principal</h4>
+        <p>Redesign completo com hero moderno, seção de benefícios, depoimentos e CTA estruturado. Abandono do Divi para código personalizado e muito mais rápido.</p>
+      </div>
+      <div class="page-card new-page reveal reveal-delay-1">
+        <div class="page-num">02</div>
+        <h4>Quem Somos <span class="new-badge">NOVO</span></h4>
+        <p>História da empresa, missão, visão e valores. Equipe com fotos e funções. Locais de atuação — locais de atuação nos estados do Pará e Roraima.</p>
+      </div>
+      <div class="page-card new-page reveal reveal-delay-2">
+        <div class="page-num">03</div>
+        <h4>Soluções / Serviços <span class="new-badge">NOVO</span></h4>
+        <p>Página dedicada ao SGConsig, gestão de margens consignáveis e integração com sistemas de folha de pagamento. Como a RF1 entrega valor para cada cliente.</p>
+      </div>
+      <div class="page-card reveal reveal-delay-3">
+        <div class="page-num">04</div>
+        <h4>FAQ / Central de Ajuda</h4>
+        <p>Expansão da FAQ existente com categorias por perfil (servidor, gestor, consignatária), busca inteligente e artigos detalhados e organizados.</p>
+      </div>
+      <div class="page-card new-page reveal reveal-delay-1">
+        <div class="page-num">05</div>
+        <h4>Princípios <span class="new-badge">NOVO</span></h4>
+        <p>Seção dedicada aos 7 princípios que norteiam o RF1Consig: adequação funcional, eficiência, compatibilidade, usabilidade, confiabilidade, segurança e manutenção.</p>
+      </div>
+      <div class="page-card new-page reveal reveal-delay-2">
+        <div class="page-num">06</div>
+        <h4>Funcionalidades do Sistema <span class="new-badge">NOVO</span></h4>
+        <p>Apresentação das funcionalidades exclusivas do SGConsig: consignações em tempo real, reserva de margem, renegociação de contratos, importação em lote, gestão de agências e controle de perfis de usuários.</p>
+      </div>
+      <div class="page-card reveal reveal-delay-3">
+        <div class="page-num">07</div>
+        <h4>Contato / Comercial</h4>
+        <p>Formulário renovado com categorização por tipo de solicitação — comercial, suporte, credenciamento. Mapa, telefones e WhatsApp integrado.</p>
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <h3 class="mt-4 mb-3 reveal">Comparativo: Antes × Depois</h3>
+    <div class="reveal" style="overflow-x:auto;">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Recurso</th>
+            <th>Atual</th>
+            <th class="blue-head">Proposto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Estrutura de páginas</td><td class="ct-no">Landing page única</td><td class="blue-col ct-yes">7 páginas bem organizadas</td></tr>
+          <tr><td>Página Quem Somos</td><td class="ct-no">Não existe</td><td class="blue-col ct-yes">Completa com equipe e atuação</td></tr>
+          <tr><td>Princípios</td><td class="ct-partial">Existe, design básico</td><td class="blue-col ct-yes">Página dedicada e redesenhada</td></tr>
+          <tr><td>Locais de atuação</td><td class="ct-no">Não existe</td><td class="blue-col ct-yes">Listados na página Quem Somos</td></tr>
+          <tr><td>Página de Soluções</td><td class="ct-no">Não existe</td><td class="blue-col ct-yes">Completa com SGConsig e diferenciais</td></tr>
+          <tr><td>FAQ e suporte</td><td class="ct-partial">FAQ básico</td><td class="blue-col ct-yes">Expandido e organizado por perfil</td></tr>
+          <tr><td>Formulário de contato</td><td class="ct-partial">Genérico</td><td class="blue-col ct-yes">Categorizado por tipo de solicitação</td></tr>
+          <tr><td>Identidade visual</td><td class="ct-partial">Básica (WordPress/Divi)</td><td class="blue-col ct-yes">Design system próprio e profissional</td></tr>
+          <tr><td>Mobile / Responsividade</td><td class="ct-partial">Parcial (Divi)</td><td class="blue-col ct-yes">Mobile-first completo</td></tr>
+          <tr><td>Performance (Core Web Vitals)</td><td class="ct-no">Pesado (WordPress+Divi)</td><td class="blue-col ct-yes">Otimizado (LCP &lt; 2.5s)</td></tr>
+          <tr><td>SEO estruturado</td><td class="ct-no">Básico</td><td class="blue-col ct-yes">Schema markup + sitemap completo</td></tr>
+          <tr><td>Credibilidade institucional</td><td class="ct-no">Aparência de landing page temporária</td><td class="blue-col ct-yes">Site sólido, confiável e informativo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- portal section removed -->
+<section id="portal" style="display:none">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-tag"><span class="dot"></span> Fase 04 — Portal Unificado</div>
+      <h2>Área Restrita <span class="gradient-text">Centralizada</span></h2>
+      <p class="lead">Um único ponto de acesso para todos os perfis de usuário. Servidores, gestores e consignatárias acessam tudo em um só lugar.</p>
+    </div>
+
+    <div class="portal-mockup reveal mt-4">
+      <div class="portal-header">
+        <div style="display:flex;align-items:center;gap:.8rem;">
+          <div style="width:8px;height:8px;background:var(--green);border-radius:50%;"></div>
+          <h3>Portal Unificado RF1 Consig</h3>
+          <span style="background:rgba(46,163,242,0.12);color:var(--blue);font-size:.72rem;padding:.2rem .6rem;border-radius:4px;">portal.rf1consig.com.br</span>
+        </div>
+        <div class="header-right">
+          <span style="font-size:.8rem;color:var(--muted);">Cliente: <strong style="color:#fff">Boa Vista</strong></span>
+          <div class="user-chip">
+            <div class="avatar">GS</div>
+            <span>Gestor</span>
+          </div>
+        </div>
+      </div>
+      <div class="portal-layout">
+        <div class="portal-sidebar">
+          <div class="sidebar-logo">
+            <div class="box">RF1</div>
+            RF1 Consig
+          </div>
+          <div class="sidebar-section">Visão Geral</div>
+          <ul class="sidebar-menu">
+            <li><a href="#" class="active"><span class="menu-icon">📊</span> Dashboard</a></li>
+            <li><a href="#"><span class="menu-icon">🏛️</span> Clientes</a></li>
+            <li><a href="#"><span class="menu-icon">👥</span> Servidores</a></li>
+          </ul>
+          <div class="sidebar-section">Portais</div>
+          <ul class="sidebar-menu">
+            <li><a href="#"><span class="menu-icon">🔒</span> Boa Vista</a></li>
+            <li><a href="#"><span class="menu-icon">🔒</span> Ananindeua</a></li>
+            <li><a href="#"><span class="menu-icon">🔒</span> Portel</a></li>
+            <li><a href="#"><span class="menu-icon">➕</span> Adicionar</a></li>
+          </ul>
+          <div class="sidebar-section">Suporte</div>
+          <ul class="sidebar-menu">
+            <li><a href="#"><span class="menu-icon">🎫</span> Chamados</a></li>
+            <li><a href="#"><span class="menu-icon">📁</span> Documentos</a></li>
+            <li><a href="#"><span class="menu-icon">⚙️</span> Configurações</a></li>
+          </ul>
+        </div>
+        <div class="portal-content">
+          <div class="portal-body">
+            <div class="portal-grid">
+              <div class="portal-stat-card">
+                <div class="ps-label">Clientes Ativos</div>
+                <div class="ps-value">4</div>
+                <div class="ps-tag up">↑ +1 este mês</div>
+              </div>
+              <div class="portal-stat-card">
+                <div class="ps-label">Servidores Cadastrados</div>
+                <div class="ps-value">1.284</div>
+                <div class="ps-tag neu">← atualizado hoje</div>
+              </div>
+              <div class="portal-stat-card">
+                <div class="ps-label">Contratos Ativos</div>
+                <div class="ps-value">3.710</div>
+                <div class="ps-tag up">↑ +142 esta semana</div>
+              </div>
+              <div class="portal-stat-card">
+                <div class="ps-label">Chamados Abertos</div>
+                <div class="ps-value">7</div>
+                <div class="ps-tag up" style="color:var(--warn);">⏱ 2 aguardando</div>
+              </div>
+            </div>
+            <div style="background:var(--dark3);border:1px solid var(--border);border-radius:10px;padding:1.2rem;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                <strong style="font-size:.9rem;">Acesso Rápido — Portais dos Clientes</strong>
+                <span style="font-size:.75rem;color:var(--muted);">Todos os acessos são auditados</span>
+              </div>
+              <table class="access-table">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Portais</th>
+                    <th>Status</th>
+                    <th>Sistema</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Boa Vista</strong> <span style="font-size:.72rem;color:var(--muted);">RR</span></td>
+                    <td>Servidor · Consignatária</td>
+                    <td><span class="status-dot on">Operacional</span></td>
+                    <td><span style="color:var(--warn);font-size:.78rem;">SGConsig v1.12</span></td>
+                    <td><span class="link-btn">Acessar →</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ananindeua</strong> <span style="font-size:.72rem;color:var(--muted);">PA</span></td>
+                    <td>Servidor</td>
+                    <td><span class="status-dot on">Operacional</span></td>
+                    <td><span style="color:var(--green);font-size:.78rem;">Blazor .NET</span></td>
+                    <td><span class="link-btn">Acessar →</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Portel</strong> <span style="font-size:.72rem;color:var(--muted);">PA</span></td>
+                    <td>Servidor · Gestor</td>
+                    <td><span class="status-dot on">Operacional</span></td>
+                    <td><span style="color:var(--warn);font-size:.78rem;">SGConsig</span></td>
+                    <td><span class="link-btn">Acessar →</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Campos</strong> <span style="font-size:.72rem;color:var(--muted);">?</span></td>
+                    <td>Servidor</td>
+                    <td><span class="status-dot off">Verificar</span></td>
+                    <td><span style="color:var(--muted);font-size:.78rem;">SGConsig</span></td>
+                    <td><span class="link-btn" style="color:var(--warn);border-color:rgba(242,165,46,0.3);">Inspecionar</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-strip reveal">
+      <div class="info-icon">💡</div>
+      <p>O Portal Unificado centraliza o acesso a todos os sistemas dos clientes com <strong style="color:#fff">autenticação única (SSO)</strong>, log de acessos auditável, gestão de permissões por perfil e monitoramento em tempo real do status de cada portal.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FUNCIONALIDADES
+============================================================ -->
+<section id="funcionalidades">
+  <div class="container">
+    <div class="text-center reveal">
+      <div class="section-tag"><span class="dot"></span> Fase 03 — Funcionalidades</div>
+      <h2>Recursos do <span class="gradient-text">Novo Site</span></h2>
+      <p class="lead">Tudo que será implementado para transformar a presença digital da RF1 Consig em algo profissional, rápido e confiável.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">🏛️</div>
+        <h4>Presença Institucional Sólida</h4>
+        <p>Páginas que contam a história da empresa, apresentam a equipe e deixam claro quem é a RF1 Consig — construindo credibilidade desde o primeiro acesso.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">🎯</div>
+        <h4>Navegação por Público</h4>
+        <p>Páginas dedicadas para cada tipo de visitante: órgãos, consignatárias e servidores — cada um encontra exatamente o que precisa sem confusão.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">📍</div>
+        <h4>Locais de Atuação</h4>
+        <p>Seção clara na página Quem Somos mostrando os locais e estados onde a RF1 Consig opera, reforçando presença e abrangência.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">❓</div>
+        <h4>FAQ Expandida e Organizada</h4>
+        <p>Central de ajuda reestruturada com categorias por perfil, busca inteligente e artigos detalhados que respondem as dúvidas mais comuns antes do contato.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">📱</div>
+        <h4>Design Mobile-First</h4>
+        <p>Site totalmente responsivo e otimizado para celulares e tablets — servidores e gestores acessam de qualquer dispositivo sem perda de qualidade.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">⚡</div>
+        <h4>Performance Otimizada</h4>
+        <p>Abandono do WordPress/Divi por uma stack moderna e leve. Core Web Vitals no verde com LCP inferior a 2.5 segundos e carregamento rápido.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔍</div>
+        <h4>SEO Estruturado</h4>
+        <p>Schema markup, sitemap otimizado e meta tags por página para garantir visibilidade nos buscadores e atrair visitantes orgânicos relevantes.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">💬</div>
+        <h4>Contato Inteligente</h4>
+        <p>Formulário categorizado por tipo de solicitação — comercial, suporte técnico, credenciamento — com WhatsApp integrado para atendimento direto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CRONOGRAMA
+============================================================ -->
+<section id="cronograma">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-tag"><span class="dot"></span> Fase 04 — Planejamento</div>
+      <h2>Cronograma de <span class="gradient-text">Execução</span></h2>
+      <p class="lead">Entrega em 4 semanas com etapas claras, validações intermediárias e acompanhamento próximo em cada fase.</p>
+    </div>
+
+    <div class="timeline reveal">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <span class="tl-week">Semana 1</span>
+        <div class="tl-content">
+          <h4>Briefing, Conteúdo e Design</h4>
+          <p>Reunião de alinhamento completo, coleta de materiais (logos, fotos, textos), definição de paleta, tipografia e criação dos protótipos navegáveis no Figma para aprovação.</p>
+          <div class="tl-tasks">
+            <span class="tl-task">Briefing completo</span>
+            <span class="tl-task">Coleta de conteúdo</span>
+            <span class="tl-task">Design System</span>
+            <span class="tl-task">Protótipo navegável</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <span class="tl-week">Semanas 2–3</span>
+        <div class="tl-content">
+          <h4>Desenvolvimento das Páginas</h4>
+          <p>Codificação das 7 páginas: Home, Quem Somos, Soluções, Princípios, Funcionalidades, FAQ e Contato. Foco em performance e mobile-first.</p>
+          <div class="tl-tasks">
+            <span class="tl-task">Home redesenhada</span>
+            <span class="tl-task">Páginas institucionais</span>
+            <span class="tl-task">Soluções / SGConsig</span>
+            <span class="tl-task">FAQ expandida</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot warn"></div>
+        <span class="tl-week w">Semana 3 — Revisão</span>
+        <div class="tl-content">
+          <h4>Revisão e Ajustes com o Cliente</h4>
+          <p>Apresentação do site em ambiente de homologação. Rodada de revisões com base no feedback da equipe RF1. Ajustes de conteúdo, texto e layout.</p>
+          <div class="tl-tasks">
+            <span class="tl-task">Ambiente de homologação</span>
+            <span class="tl-task">Revisão de conteúdo</span>
+            <span class="tl-task">Ajustes de layout</span>
+            <span class="tl-task">Aprovação final</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot green"></div>
+        <span class="tl-week g">Semana 4 — Entrega</span>
+        <div class="tl-content">
+          <h4>QA, SEO, Testes e Deploy</h4>
+          <p>Auditoria completa de performance e SEO, testes cross-browser e em dispositivos móveis, configuração de analytics. Deploy em produção com acompanhamento pós-lançamento.</p>
+          <div class="tl-tasks">
+            <span class="tl-task">Auditoria Lighthouse</span>
+            <span class="tl-task">Schema markup + sitemap</span>
+            <span class="tl-task">Testes cross-browser</span>
+            <span class="tl-task">🚀 Go Live</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-strip reveal">
+      <div class="info-icon">📅</div>
+      <p>Prazo total: <strong style="color:#fff">4 semanas</strong> do briefing ao lançamento. Revisões incluídas em cada etapa. Após o Go Live, <strong style="color:#fff">30 dias de suporte</strong> para ajustes pós-lançamento.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     INVESTIMENTO
+============================================================ -->
+<section id="investimento">
+  <div class="container">
+    <div class="text-center reveal">
+      <div class="section-tag"><span class="dot"></span> Fase 05 — Investimento</div>
+      <h2>Valor do <span class="gradient-text">Investimento</span></h2>
+      <p class="lead">Um único valor fixo, sem surpresas. Tudo incluído para entregar o site que a RF1 Consig precisa.</p>
+    </div>
+
+    <div class="reveal" style="max-width:560px;margin:3rem auto 0;">
+      <div class="pricing-card featured reveal" style="text-align:center;">
+        <div class="plan-name">Site Institucional Completo</div>
+        <h3 style="font-size:1.8rem;margin-bottom:.5rem;">RF1 Consig</h3>
+        <div class="plan-price" style="text-align:center;">
+          <span class="currency">R$</span>
+          <span class="amount">3.000</span>
+          <span class="period">valor único · tudo incluído</span>
+        </div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features" style="text-align:left;">
+          <li><span class="check">✓</span> 7 páginas completas e otimizadas</li>
+          <li><span class="check">✓</span> Home redesenhada com identidade sólida</li>
+          <li><span class="check">✓</span> Quem Somos com equipe e locais de atuação</li>
+          <li><span class="check">✓</span> Soluções / SGConsig com apresentação completa</li>
+          <li><span class="check">✓</span> Soluções / Serviços com apresentação do SGConsig</li>
+          <li><span class="check">✓</span> FAQ expandida e organizada por perfil</li>
+          <li><span class="check">✓</span> Contato com formulário categorizado + WhatsApp</li>
+          <li><span class="check">✓</span> Design responsivo mobile-first</li>
+          <li><span class="check">✓</span> Performance otimizada (sem WordPress/Divi)</li>
+          <li><span class="check">✓</span> SEO on-page + schema markup + sitemap</li>
+          <li><span class="check">✓</span> Protótipo no Figma para aprovação</li>
+          <li><span class="check">✓</span> 30 dias de suporte pós-entrega</li>
+          <li><span class="check">✓</span> Código-fonte 100% da RF1 Consig</li>
+        </ul>
+        <a href="https://wa.me/5562985905255" class="btn-plan blue" style="display:block;text-decoration:none;font-size:1rem;padding:1rem;">
+          💬 Fechar com a Brave Web + ID
+        </a>
+      </div>
+    </div>
+
+    <!-- Formas de Pagamento -->
+    <div class="payment-section reveal">
+      <h3>💳 Formas de Pagamento</h3>
+      <div class="payment-methods">
+        <div class="payment-method">
+          <div class="pm-icon">⚡</div>
+          <div class="pm-name">PIX</div>
+          <div class="pm-desc">Transferência instantânea</div>
+          <div class="discount-badge">Preferencial</div>
+        </div>
+        <div class="payment-method">
+          <div class="pm-icon">🏦</div>
+          <div class="pm-name">Transferência Bancária</div>
+          <div class="pm-desc">TED / DOC em conta PJ</div>
+        </div>
+      </div>
+
+      <div style="margin-top:2rem;background:rgba(46,163,242,0.06);border:1px solid rgba(46,163,242,0.15);border-radius:10px;padding:1.5rem;">
+        <div style="font-size:.8rem;color:var(--muted);margin-bottom:.3rem;">CONDIÇÃO DE PAGAMENTO</div>
+        <div style="font-size:.95rem;color:#fff;font-weight:600;">50% na assinatura do contrato + 50% na entrega e aprovação final</div>
+      </div>
+    </div>
+
+    <!-- Garantias -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:2.5rem;">
+      <div class="reveal" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.4rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:.5rem;">🛡️</div>
+        <div style="font-weight:700;color:#fff;margin-bottom:.3rem;font-size:.9rem;">Garantia de Qualidade</div>
+        <div style="font-size:.8rem;color:var(--muted);">Revisões ilimitadas até aprovação total do cliente</div>
+      </div>
+      <div class="reveal reveal-delay-1" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.4rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:.5rem;">📋</div>
+        <div style="font-weight:700;color:#fff;margin-bottom:.3rem;font-size:.9rem;">Contrato Formal</div>
+        <div style="font-size:.8rem;color:var(--muted);">Escopo, prazos e responsabilidades documentados</div>
+      </div>
+      <div class="reveal reveal-delay-2" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.4rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:.5rem;">⚡</div>
+        <div style="font-weight:700;color:#fff;margin-bottom:.3rem;font-size:.9rem;">Código-fonte Entregue</div>
+        <div style="font-size:.8rem;color:var(--muted);">Todo o código é propriedade da RF1 Consig</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="fb-logo" style="margin-bottom:1rem;">
+        <svg style="height:40px;width:auto;" viewBox="0 0 172 117" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#ffffff" d="M104.8,4.6h-45.7v50.4h45.7l-24.5-25.2,24.5-25.2ZM99.4,6.9l-20.7,21.3-17.2-17.8v-3.4h37.9ZM99.4,52.8h-37.9V13.6l15.6,16.2h0s22.3,22.9,22.3,22.9Z"/>
+          <polygon fill="#ffffff" points="87.6 30.1 112 4.6 108.8 4.6 84.3 30.1 109.6 55 112.9 55 87.6 30.1"/>
+          <path fill="#ffffff" d="M14,54.7c1.2,0,2.3.2,3.3.5,1,.3,1.8.8,2.5,1.4.7.6,1.2,1.4,1.6,2.2.4.9.6,1.9.6,2.9v16.5c0,1.2-.2,2.2-.7,3-.5.8-1.2,1.4-2,1.9.9.5,1.6,1.1,2,1.8.5.8.7,1.7.7,2.9v17.5c0,2.2-.7,3.9-2.2,5.2-1.5,1.3-3.4,1.9-5.9,1.9h-7.3c-.3,0-.5,0-.6-.2-.1-.2-.2-.4-.2-.6v-56c0-.2,0-.5.2-.6.1-.2.4-.2.6-.2h7.4ZM16.3,61.7c0-.7-.2-1.3-.6-1.8-.4-.5-1-.7-1.9-.7h-2.5v21.4h2.5c.8,0,1.5-.2,1.9-.7.4-.5.6-1.1.6-1.8v-16.5ZM16.3,87.8c0-.7-.2-1.3-.6-1.8-.4-.5-1-.7-1.8-.7h-2.5v22.5h2.5c.8,0,1.5-.2,1.9-.7.4-.5.6-1.1.6-1.8v-17.5Z"/>
+          <path fill="#ffffff" d="M51.9,63.7c1.2,0,2.3.2,3.3.5,1,.3,1.8.8,2.5,1.4.7.6,1.2,1.3,1.6,2.2s.6,1.9.6,2.9v15c0,1.2-.2,2.2-.7,3-.5.8-1.2,1.4-2,1.9.9.5,1.6,1.1,2,1.8.5.8.7,1.7.7,2.9v16.1c0,.2,0,.5-.2.6-.1.2-.4.2-.6.2h-2.4c-.8,0-1.4-.2-1.8-.7-.4-.5-.6-1-.6-1.8v-14.6c0-.7-.2-1.3-.6-1.8s-1-.7-1.9-.7h-2.5v17c0,.7-.2,1.3-.6,1.8-.4.5-1,.7-1.8.7h-2.4c-.3,0-.5,0-.6-.2-.1-.2-.2-.4-.2-.6v-46.9c0-.2,0-.5.2-.6.1-.2.4-.2.6-.2h7.4ZM49.4,68.3v20h2.5c.8,0,1.5-.2,1.9-.7.4-.5.6-1.1.6-1.8v-15c0-.7-.2-1.3-.6-1.8-.4-.5-1-.7-1.8-.7h-2.5Z"/>
+          <path fill="#ffffff" d="M90.8,63.7c.3,0,.5,0,.6.2.1.2.2.4.3.6l4.6,46.8c0,.2,0,.5-.2.7-.2.2-.5.3-.9.3h-2.1c-.7,0-1.3-.2-1.8-.6-.5-.4-.7-.9-.8-1.5l-.4-6.6h-3.5l-.4,6.6c0,.6-.3,1.1-.8,1.5-.5.4-1,.6-1.8.6h-2.1c-.4,0-.7-.1-.9-.3-.2-.2-.3-.5-.2-.7l4.6-46.8c0-.2.1-.4.3-.6.1-.2.3-.2.6-.2h4.8ZM87,99.1h2.9l-1.5-23.5-1.4,23.5Z"/>
+          <path fill="#ffffff" d="M121.8,112.4c-.3,0-.5,0-.6-.2s-.2-.4-.3-.6l-4.6-46.8c0-.2,0-.5.2-.7.2-.2.5-.3.9-.3h2.1c.7,0,1.3.2,1.8.6.5.4.7.9.8,1.5l2.2,34.8,2.2-34.8c0-.6.3-1.1.8-1.5.5-.4,1-.6,1.8-.6h2.1c.4,0,.7.1.9.3.2.2.3.5.2.7l-4.6,46.8c0,.2-.1.4-.3.6-.1.2-.3.2-.6.2h-4.8Z"/>
+          <path fill="#ffffff" d="M165.3,54.7c.3,0,.5,0,.6.2.2.1.3.3.3.6v1.4c0,.7-.2,1.3-.6,1.7-.4.4-.9.7-1.6.7h-5.2v22.2h5.6c.3,0,.5,0,.6.2.2.1.3.3.3.6v1.4c0,.7-.2,1.3-.6,1.7-.4.4-.9.7-1.6.7h-4.4v21.7h5.2c.6,0,1.2.2,1.6.7.4.4.6,1,.6,1.7v1.4c0,.3,0,.5-.3.6-.2.1-.4.2-.6.2h-11.3c-.3,0-.5,0-.6-.2-.1-.2-.2-.4-.2-.6v-56c0-.2,0-.5.2-.6.1-.2.4-.2.6-.2h11.3Z"/>
+        </svg>
+      </div>
+      <p>Soluções Web + ID · Goiânia/GO</p>
+      <div style="margin-top:1rem;display:flex;gap:.8rem;">
+        <span style="background:rgba(46,163,242,0.12);border:1px solid rgba(46,163,242,0.2);color:var(--blue);padding:.3rem .8rem;border-radius:4px;font-size:.75rem;">nelson.vieiramartins@gmail.com</span>
+        <span style="background:rgba(46,163,242,0.12);border:1px solid rgba(46,163,242,0.2);color:var(--blue);padding:.3rem .8rem;border-radius:4px;font-size:.75rem;">(62) 98590-5255</span>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Seções da Proposta</h4>
+      <ul>
+        <li><a href="#diagnostico">Diagnóstico Atual</a></li>
+        <li><a href="#proposta">Proposta de Site</a></li>
+        <li><a href="#funcionalidades">Funcionalidades</a></li>
+        <li><a href="#cronograma">Cronograma</a></li>
+        <li><a href="#investimento">Investimento</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contato</h4>
+      <ul>
+        <li><a href="https://wa.me/5562985905255">💬 WhatsApp</a></li>
+        <li><a href="mailto:nelson.vieiramartins@gmail.com">✉ E-mail</a></li>
+        <li><a href="#investimento">Investimento — R$ 3.000</a></li>
+        <li><a href="#proposta">Ver Páginas Propostas</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 RF1 Consig — Proposta de Reestruturação Digital. Documento confidencial.</p>
+    <p class="agency">Documento elaborado por <strong>BRAVE</strong> · Soluções Web + ID · Goiânia/GO</p>
+  </div>
+</footer>
+
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+  // Progress bar
+  const progressBar = document.getElementById('progress-bar');
+  const navbar = document.getElementById('navbar');
+  const backTop = document.getElementById('back-top');
+
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = (scrollTop / docHeight) * 100;
+    progressBar.style.width = progress + '%';
+
+    navbar.classList.toggle('scrolled', scrollTop > 50);
+    backTop.classList.toggle('show', scrollTop > 400);
+
+    // Active nav links
+    const sections = document.querySelectorAll('section[id]');
+    let current = '';
+    sections.forEach(s => {
+      if (scrollTop >= s.offsetTop - 120) current = s.id;
+    });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  reveals.forEach(r => observer.observe(r));
+
+  // Smooth scroll for all anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Animate counter numbers in hero
+  const animateNum = (el, target) => {
+    let current = 0;
+    const step = target / 40;
+    const timer = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = Math.floor(current);
+      if (current >= target) clearInterval(timer);
+    }, 40);
+  };
+
+  // Trigger counter animation when hero is visible
+  const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        document.querySelectorAll('.hero-stat .num').forEach(el => {
+          const text = el.textContent;
+          const num = parseInt(text.replace(/\D/g, ''));
+          const suffix = text.replace(/\d/g, '');
+          if (num) {
+            el.innerHTML = '';
+            const span = document.createElement('span');
+            el.appendChild(span);
+            if (suffix.includes('+')) {
+              el.insertAdjacentHTML('beforeend', '<span style="color:var(--blue)">+</span>');
+            }
+            animateNum(span, num);
+          }
+        });
+        heroObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.5 });
+  heroObserver.observe(document.getElementById('hero'));
+</script>
+</body>
+</html>
