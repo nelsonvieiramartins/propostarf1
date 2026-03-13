@@ -582,9 +582,9 @@
       box-shadow: 0 0 0 1px var(--blue), var(--glow);
     }
     .pricing-card.featured::before {
-      content: 'MAIS POPULAR';
+      content: 'RECOMENDADO';
       position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-      background: var(--blue); color: #fff;
+      background: var(--green); color: #051a10;
       font-size: .7rem; font-weight: 800; letter-spacing: .1em;
       padding: .3rem 1rem; border-radius: 20px;
     }
@@ -1449,17 +1449,31 @@
     <div class="text-center reveal">
       <div class="section-tag"><span class="dot"></span> Fase 05 — Investimento</div>
       <h2>Valor do <span class="gradient-text">Investimento</span></h2>
-      <p class="lead">Um único valor fixo, sem surpresas. Tudo incluído para entregar o site que a RF1 Consig precisa.</p>
+      <p class="lead">Escolha o modelo que melhor se encaixa na sua necessidade — pagamento único ou plano com suporte e evolução contínua do site.</p>
     </div>
 
-    <div class="reveal" style="max-width:560px;margin:3rem auto 0;">
-      <div class="pricing-card featured reveal" style="text-align:center;">
-        <div class="plan-name">Site Institucional Completo</div>
-        <h3 style="font-size:1.8rem;margin-bottom:.5rem;">RF1 Consig</h3>
+    <div class="pricing-grid reveal" style="margin-top:3rem;">
+
+      <!-- Plano Site Único -->
+      <div class="pricing-card" style="text-align:center;">
+        <div class="plan-name">Site Institucional</div>
+        <h3 style="font-size:1.5rem;margin-bottom:.5rem;">Pagamento Único</h3>
         <div class="plan-price" style="text-align:center;">
           <span class="currency">R$</span>
           <span class="amount">3.000</span>
-          <span class="period">valor único · tudo incluído</span>
+          <span class="period">valor único · entrega em 30 dias</span>
+        </div>
+        <div style="margin-top:1rem;border:1px solid rgba(46,163,242,.2);border-radius:10px;overflow:hidden;font-size:.82rem;text-align:left;">
+          <div style="background:rgba(0,200,150,.1);border-bottom:1px solid rgba(46,163,242,.12);padding:.55rem 1rem;display:flex;align-items:center;gap:.5rem;">
+            <span style="font-size:.95rem;">🛡️</span>
+            <span style="color:var(--green);font-weight:700;">30 dias de garantia pós-entrega</span>
+          </div>
+          <div style="padding:.5rem 1rem;color:var(--muted);">Correções e ajustes do escopo entregue sem custo adicional.</div>
+          <div style="background:rgba(46,163,242,.08);border-top:1px solid rgba(46,163,242,.12);padding:.55rem 1rem;display:flex;align-items:center;gap:.5rem;">
+            <span style="color:var(--blue);font-weight:800;white-space:nowrap;">R$ 300</span>
+            <span style="color:var(--muted);">/ solicitação após o período de garantia</span>
+          </div>
+          <div style="padding:.45rem 1rem;color:var(--muted);font-size:.76rem;border-top:1px solid rgba(255,255,255,.05);">Válido para alterações simples de texto ou imagem já presentes no site.</div>
         </div>
         <div class="plan-divider"></div>
         <ul class="plan-features" style="text-align:left;">
@@ -1467,9 +1481,8 @@
           <li><span class="check">✓</span> Home redesenhada com identidade sólida</li>
           <li><span class="check">✓</span> Quem Somos com equipe e locais de atuação</li>
           <li><span class="check">✓</span> Soluções / SGConsig com apresentação completa</li>
-          <li><span class="check">✓</span> Soluções / Serviços com apresentação do SGConsig</li>
           <li><span class="check">✓</span> FAQ expandida e organizada por perfil</li>
-          <li><span class="check">✓</span> Contato com formulário categorizado + link para WhatsApp</li>
+          <li><span class="check">✓</span> Contato com formulário + link WhatsApp</li>
           <li><span class="check">✓</span> Design responsivo mobile-first</li>
           <li><span class="check">✓</span> Performance otimizada (sem WordPress/Divi)</li>
           <li><span class="check">✓</span> SEO on-page + schema markup + sitemap</li>
@@ -1477,10 +1490,61 @@
           <li><span class="check">✓</span> 30 dias de suporte pós-entrega</li>
           <li><span class="check">✓</span> Código-fonte 100% da RF1 Consig</li>
         </ul>
-        <a href="https://wa.me/5562985905255" class="btn-plan blue" style="display:block;text-decoration:none;font-size:1rem;padding:1rem;">
-          💬 Fechar com a Brave Web + ID
+        <div style="margin-top:.2rem;background:rgba(242,92,92,.07);border:1px solid rgba(242,92,92,.2);border-radius:8px;padding:.7rem 1rem;text-align:left;">
+          <div style="font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--danger);text-transform:uppercase;margin-bottom:.5rem;">Não incluso</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:.4rem;">
+            <li style="display:flex;align-items:flex-start;gap:.5rem;font-size:.83rem;color:var(--muted);"><span style="color:var(--danger);flex-shrink:0;font-weight:700;">✕</span> Implementações de novas áreas no site</li>
+            <li style="display:flex;align-items:flex-start;gap:.5rem;font-size:.83rem;color:var(--muted);"><span style="color:var(--danger);flex-shrink:0;font-weight:700;">✕</span> Hospedagem</li>
+            <li style="display:flex;align-items:flex-start;gap:.5rem;font-size:.83rem;color:var(--muted);"><span style="color:var(--danger);flex-shrink:0;font-weight:700;">✕</span> Suporte técnico após período de garantia</li>
+          </ul>
+        </div>
+        <a href="https://wa.me/5562985905255" class="btn-plan outline" style="display:block;text-decoration:none;font-size:1rem;padding:1rem;">
+          💬 Quero este plano
         </a>
       </div>
+
+      <!-- Plano Suporte Total -->
+      <div class="pricing-card featured" style="text-align:center;">
+        <div class="plan-name">Plano Suporte Total</div>
+        <h3 style="font-size:1.5rem;margin-bottom:.5rem;">Implementação + Manutenção</h3>
+        <div class="plan-price" style="text-align:center;">
+          <div style="margin-bottom:.2rem;">
+            <span class="currency">R$</span><span class="amount" style="font-size:2.4rem;">2.000</span>
+            <span class="period" style="display:inline;margin-left:.3rem;">implementação</span>
+          </div>
+          <div style="color:var(--muted);font-size:1rem;margin:.1rem 0;font-weight:700;">+</div>
+          <div>
+            <span class="currency">R$</span><span class="amount" style="font-size:2.4rem;">500</span>
+            <span class="period" style="display:inline;margin-left:.3rem;">/mês · por 6 meses</span>
+          </div>
+          <div style="margin-top:1rem;background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.25);color:var(--green);border-radius:8px;padding:.5rem 1rem;font-size:.82rem;font-weight:700;display:inline-block;">
+            Total: R$ 5.000 · hospedagem inclusa
+          </div>
+        </div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features" style="text-align:left;">
+          <li><span class="check">✓</span> Tudo do plano Site Institucional</li>
+          <li><span class="check">✓</span> <strong>Hospedagem inclusa</strong> durante todo o plano</li>
+          <li><span class="check">✓</span> <strong>Suporte técnico mensal</strong> dedicado</li>
+          <li><span class="check">✓</span> Novas áreas de conteúdo sob demanda</li>
+          <li><span class="check">✓</span> Correções e ajustes sem custo adicional</li>
+          <li><span class="check">✓</span> Atualizações de design e textos</li>
+          <li><span class="check">✓</span> Prioridade no atendimento</li>
+        </ul>
+        <div style="margin-top:.2rem;background:rgba(242,92,92,.07);border:1px solid rgba(242,92,92,.2);border-radius:8px;padding:.7rem 1rem;text-align:left;">
+          <div style="font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--danger);text-transform:uppercase;margin-bottom:.5rem;">Não incluso</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:.4rem;">
+            <li style="display:flex;align-items:flex-start;gap:.5rem;font-size:.83rem;color:var(--muted);"><span style="color:var(--danger);flex-shrink:0;font-weight:700;">✕</span> Banco de dados e cadastros</li>
+            <li style="display:flex;align-items:flex-start;gap:.5rem;font-size:.83rem;color:var(--muted);"><span style="color:var(--danger);flex-shrink:0;font-weight:700;">✕</span> Controle de acesso / login</li>
+            <li style="display:flex;align-items:flex-start;gap:.5rem;font-size:.83rem;color:var(--muted);"><span style="color:var(--danger);flex-shrink:0;font-weight:700;">✕</span> Painéis administrativos (CMS)</li>
+            <li style="display:flex;align-items:flex-start;gap:.5rem;font-size:.83rem;color:var(--muted);"><span style="color:var(--danger);flex-shrink:0;font-weight:700;">✕</span> Sistemas complexos de gestão</li>
+          </ul>
+        </div>
+        <a href="https://wa.me/5562985905255" class="btn-plan green" style="display:block;text-decoration:none;font-size:1rem;padding:1rem;">
+          🚀 Quero o Suporte Total
+        </a>
+      </div>
+
     </div>
 
     <!-- Formas de Pagamento -->
@@ -1500,9 +1564,41 @@
         </div>
       </div>
 
-      <div style="margin-top:2rem;background:rgba(46,163,242,0.06);border:1px solid rgba(46,163,242,0.15);border-radius:10px;padding:1.5rem;">
-        <div style="font-size:.8rem;color:var(--muted);margin-bottom:.3rem;">CONDIÇÃO DE PAGAMENTO</div>
-        <div style="font-size:.95rem;color:#fff;font-weight:600;">50% na assinatura do contrato + 50% na entrega e aprovação final</div>
+      <div style="margin-top:2rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div style="background:rgba(46,163,242,0.06);border:1px solid rgba(46,163,242,0.15);border-radius:10px;padding:1.5rem;">
+          <div style="font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:.8rem;">Plano Site Institucional</div>
+          <div style="display:flex;flex-direction:column;gap:.5rem;">
+            <div style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;">
+              <span style="background:rgba(46,163,242,.15);color:var(--blue);font-weight:800;font-size:.75rem;padding:.2rem .55rem;border-radius:4px;white-space:nowrap;">50%</span>
+              <span style="color:var(--text);">Na assinatura do contrato</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;">
+              <span style="background:rgba(0,200,150,.12);color:var(--green);font-weight:800;font-size:.75rem;padding:.2rem .55rem;border-radius:4px;white-space:nowrap;">50%</span>
+              <span style="color:var(--text);">Na entrega e aprovação final</span>
+            </div>
+          </div>
+        </div>
+        <div style="background:rgba(46,163,242,0.06);border:1px solid rgba(46,163,242,0.15);border-radius:10px;padding:1.5rem;">
+          <div style="font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:.8rem;">Plano Suporte Total</div>
+          <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;">Implementação (R$ 2.000)</div>
+          <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
+            <div style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;">
+              <span style="background:rgba(46,163,242,.15);color:var(--blue);font-weight:800;font-size:.75rem;padding:.2rem .55rem;border-radius:4px;white-space:nowrap;">50%</span>
+              <span style="color:var(--text);">Na assinatura do contrato</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;">
+              <span style="background:rgba(0,200,150,.12);color:var(--green);font-weight:800;font-size:.75rem;padding:.2rem .55rem;border-radius:4px;white-space:nowrap;">50%</span>
+              <span style="color:var(--text);">Na entrega e aprovação final</span>
+            </div>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:.8rem;">
+            <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;">Mensalidade</div>
+            <div style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;">
+              <span style="background:rgba(242,165,46,.12);color:var(--warn);font-weight:800;font-size:.75rem;padding:.2rem .55rem;border-radius:4px;white-space:nowrap;">R$ 500</span>
+              <span style="color:var(--text);">Cobrado no início de cada mês</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
