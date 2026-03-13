@@ -651,6 +651,13 @@
       border-radius: 4px; margin-top: .4rem;
     }
 
+    .payment-conditions-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem;
+    }
+    @media (max-width: 600px) {
+      .payment-conditions-grid { grid-template-columns: 1fr; }
+    }
+
     /* Custom quote */
     .custom-quote {
       margin-top: 2rem; background: linear-gradient(135deg, rgba(46,163,242,0.1), rgba(0,200,150,0.05));
@@ -1564,7 +1571,7 @@
         </div>
       </div>
 
-      <div style="margin-top:2rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div class="payment-conditions-grid">
         <div style="background:rgba(46,163,242,0.06);border:1px solid rgba(46,163,242,0.15);border-radius:10px;padding:1.5rem;">
           <div style="font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:.8rem;">Plano Site Institucional</div>
           <div style="display:flex;flex-direction:column;gap:.5rem;">
